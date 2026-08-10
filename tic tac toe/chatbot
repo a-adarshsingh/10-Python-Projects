@@ -1,0 +1,70 @@
+"""
+Rule-based Chatbot — simple keyword/pattern matching conversation bot.
+"""
+import re
+import random
+
+RESPONSES = [
+    (r"\bhello\b|\bhi\b|\bhey\b", [
+        "Hello! How are you doing today?",
+        "Hi there! What's on your mind?",
+    ]),
+    (r"\bmy name is (\w+)", [
+        "Nice to meet you, {0}!",
+    ]),
+    (r"\bhow are you\b", [
+        "I'm just a program, but I'm doing well! How about you?",
+    ]),
+    (r"\bbye\b|\bquit\b|\bexit\b", [
+        "Goodbye! Take care.",
+    ]),
+    (r"\bweather\b", [
+        "I can't check the weather myself, but I hope it's nice where you are!",
+    ]),
+    (r"\bwhat can you do\b|\bhelp\b", [
+        "I can chat about simple things — try saying hello, telling me your name, or asking how I am.",
+    ]),
+    (r"\bthank(s| you)\b", [
+        "You're welcome!",
+    ]),
+]
+
+DEFAULT_RESPONSES = [
+    "Interesting — tell me more.",
+    "I'm not sure I understand. Could you rephrase that?",
+    "Hmm, go on.",
+]
+
+
+def get_response(user_input, user_name):
+    text = user_input.lower()
+
+    for pattern, replies in RESPONSES:
+        match = re.search(pattern, text)
+        if match:
+            reply = random.choice(replies)
+            if match.groups() and match.groups()[0]:
+                return reply.format(match.groups()[0]), match.groups()[0]
+            return reply, user_name
+
+    return random.choice(DEFAULT_RESPONSES), user_name
+
+
+def main():
+    print("Chatbot: Hi! Type 'bye' to exit.")
+    user_name = None
+
+    while True:
+        user_input = input("You: ").strip()
+        if not user_input:
+            continue
+
+        reply, user_name = get_response(user_input, user_name)
+        print(f"Chatbot: {reply}")
+
+        if re.search(r"\bbye\b|\bquit\b|\bexit\b", user_input.lower()):
+            break
+
+
+if __name__ == "__main__":
+    main()
